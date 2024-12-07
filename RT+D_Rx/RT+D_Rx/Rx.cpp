@@ -92,25 +92,26 @@ int main() {
     infile.ignore();
 
 
-    Point origin, rot, scale;
-    if (!(infile >> origin.x >> origin.y)) {
-        std::cerr << "读取origin出错。\n";
-        return 1;
-    }
-    infile.ignore();
+    Point origin[5], rot[5], scale[5];
+    for (int i = 0;i < 5;i++) {
+        if (!(infile >> origin[i].x >> origin[i].y)) {
+            std::cerr << "读取origin出错。\n";
+            return 1;
+        }
+        infile.ignore();
 
-    if (!(infile >> rot.x >> rot.y)) {
-        std::cerr << "读取rot出错。\n";
-        return 1;
-    }
-    infile.ignore();
+        if (!(infile >> rot[i].x >> rot[i].y)) {
+            std::cerr << "读取rot出错。\n";
+            return 1;
+        }
+        infile.ignore();
 
-    if (!(infile >> scale.x >> scale.y)) {
-        std::cerr << "读取scale出错。\n";
-        return 1;
+        if (!(infile >> scale[i].x >> scale[i].y)) {
+            std::cerr << "读取scale出错。\n";
+            return 1;
+        }
+        infile.ignore();
     }
-    infile.ignore();
-
 
     int vecSize;
     if (!(infile >> vecSize)) {
@@ -182,9 +183,11 @@ int main() {
     std::cout << "Cal: "; for (const auto& s : Cal) std::cout << s << " "; std::cout << "\n";
     //std::cout << "ConstID1 (type: " << typeid(ConstID1).name() << "): "; while (!ConstID1.empty()) { std::cout << ConstID1.front() << " "; ConstID1.pop(); } std::cout << "\n";
     //std::cout << "ConstID2 (type: " << typeid(ConstID2).name() << "): "; while (!ConstID2.empty()) { std::cout << ConstID2.front() << " "; ConstID2.pop(); } std::cout << "\n";
-    std::cout << "origin: (" << origin.x << ", " << origin.y << ")\n";
-    std::cout << "rot: (" << rot.x << ", " << rot.y << ")\n";
-    std::cout << "scale: (" << scale.x << ", " << scale.y << ")\n";
+    for (int i = 0;i < 5;i++) {
+        std::cout << "origin"<<i<<": (" << origin[i].x << ", " << origin[i].y << ")\n";
+        std::cout << "rot" << i << ": (" << rot[i].x << ", " << rot[i].y << ")\n";
+        std::cout << "scale" << i << ": (" << scale[i].x << ", " << scale[i].y << ")\n";
+    }
     std::cout << "start: "; for (float f : start) std::cout << f << " "; std::cout << "\n";
     std::cout << "endPlace: "; for (float f : endPlace) std::cout << f << " "; std::cout << "\n";
     std::cout << "step: "; for (float f : step) std::cout << f << " "; std::cout << "\n";
@@ -215,14 +218,16 @@ int main() {
 
     if (Cal[0] != "") {
         for (float i = start[0]; i < endPlace[0]; i = i + step[0]) {
-            float tempx = scale.x * calValue(Cal[0], ConstID1, i);
-            float tempy = scale.y * calValue(Cal[1], ConstID2, i);
+            float tempx = scale[0].x * calValue(Cal[0], ConstID1, i);
+            float tempy = scale[0].y * calValue(Cal[1], ConstID2, i);
             ConstID1 = tempID1;
             ConstID2 = tempID2;
-            float x = tempx * cos(rot.x) + tempy * sin(rot.x) + origin.x;          // x坐标从0到400
-            float y = tempy * cos(rot.x) - tempx * sin(rot.x) + origin.y;          // 根据y = 2x计算y坐标
+            float x = tempx * cos(rot[0].x) + tempy * sin(rot[0].x) + origin[0].x;          // x坐标从0到400
+            float y = tempy * cos(rot[0].x) - tempx * sin(rot[0].x) + origin[0].y;          // 根据y = 2x计算y坐标
             points1.push_back(sf::Vector2f(x, y));
         }
+        calValue(Cal[0], ConstID1, 0);
+        calValue(Cal[1], ConstID2, 0);
     }
     
 
@@ -231,14 +236,16 @@ int main() {
     
     if (Cal[2] != "") {
         for (float i = start[1]; i < endPlace[1]; i = i + step[1]) {
-            float tempx = scale.x * calValue(Cal[2], ConstID1, i);
-            float tempy = scale.y * calValue(Cal[3], ConstID2, i);
+            float tempx = scale[1].x * calValue(Cal[2], ConstID1, i);
+            float tempy = scale[1].y * calValue(Cal[3], ConstID2, i);
             ConstID1 = tempID1_1;
             ConstID2 = tempID2_1;
-            float x = tempx * cos(rot.x) + tempy * sin(rot.x) + origin.x;          
-            float y = tempy * cos(rot.x) - tempx * sin(rot.x) + origin.y;         
+            float x = tempx * cos(rot[1].x) + tempy * sin(rot[1].x) + origin[1].x;
+            float y = tempy * cos(rot[1].x) - tempx * sin(rot[1].x) + origin[1].y;
             points1.push_back(sf::Vector2f(x, y));
         }
+        calValue(Cal[2], ConstID1, 0);
+        calValue(Cal[3], ConstID2, 0);
     }
 
     
@@ -246,15 +253,17 @@ int main() {
     Queue<float> tempID2_2 = ConstID2;
     if (Cal[4] != "") {
         for (float i = start[2]; i < endPlace[2]; i = i + step[2]) {
-            float tempx = scale.x * calValue(Cal[4], ConstID1, i);
-            float tempy = scale.y * calValue(Cal[5], ConstID2, i);
+            float tempx = scale[2].x * calValue(Cal[4], ConstID1, i);
+            float tempy = scale[2].y * calValue(Cal[5], ConstID2, i);
             ConstID1 = tempID1_2;
             ConstID2 = tempID2_2;
-            float x = tempx * cos(rot.x) + tempy * sin(rot.x) + origin.x;          
-            float y = tempy * cos(rot.x) - tempx * sin(rot.x) + origin.y;         
+            float x = tempx * cos(rot[2].x) + tempy * sin(rot[2].x) + origin[2].x;
+            float y = tempy * cos(rot[2].x) - tempx * sin(rot[2].x) + origin[2].y;
             points1.push_back(sf::Vector2f(x, y));
 
         }
+        calValue(Cal[4], ConstID1, 0);
+        calValue(Cal[5], ConstID2, 0);
     }
 
 
@@ -262,14 +271,16 @@ int main() {
     Queue<float> tempID2_3 = ConstID2;
     if (Cal[6] != "") {
         for (float i = start[3]; i < endPlace[3]; i = i + step[3]) {
-            float tempx = scale.x * calValue(Cal[6], ConstID1, i);
-            float tempy = scale.y * calValue(Cal[7], ConstID2, i);
+            float tempx = scale[3].x * calValue(Cal[6], ConstID1, i);
+            float tempy = scale[3].y * calValue(Cal[7], ConstID2, i);
             ConstID1 = tempID1_3;
             ConstID2 = tempID2_3;
-            float x = tempx * cos(rot.x) + tempy * sin(rot.x) + origin.x;          
-            float y = tempy * cos(rot.x) - tempx * sin(rot.x) + origin.y;        
+            float x = tempx * cos(rot[3].x) + tempy * sin(rot[3].x) + origin[3].x;
+            float y = tempy * cos(rot[3].x) - tempx * sin(rot[3].x) + origin[3].y;
             points1.push_back(sf::Vector2f(x, y));
         }
+        calValue(Cal[6], ConstID1, 0);
+        calValue(Cal[7], ConstID2, 0);
     }
 
 
@@ -277,14 +288,16 @@ int main() {
     Queue<float> tempID2_4 = ConstID2;
     if (Cal[8] != "") {
         for (float i = start[4]; i < endPlace[4]; i = i + step[4]) {
-            float tempx = scale.x * calValue(Cal[8], ConstID1, i);
-            float tempy = scale.y * calValue(Cal[9], ConstID2, i);
+            float tempx = scale[4].x * calValue(Cal[8], ConstID1, i);
+            float tempy = scale[4].y * calValue(Cal[9], ConstID2, i);
             ConstID1 = tempID1_4;
             ConstID2 = tempID2_4;
-            float x = tempx * cos(rot.x) + tempy * sin(rot.x) + origin.x;         
-            float y = tempy * cos(rot.x) - tempx * sin(rot.x) + origin.y;       
+            float x = tempx * cos(rot[4].x) + tempy * sin(rot[4].x) + origin[4].x;
+            float y = tempy * cos(rot[4].x) - tempx * sin(rot[4].x) + origin[4].y;
             points1.push_back(sf::Vector2f(x, y));
         }
+        calValue(Cal[8], ConstID1, 0);
+        calValue(Cal[9], ConstID2, 0);
     }
     
 

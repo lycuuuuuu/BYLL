@@ -33,6 +33,7 @@
 [Ss][Qq][Rr][Tt]            {return SQRT;}
 [Ee][Xx][Pp]                {return EXP;}
 [Ll][Nn]                    {return LN;}
+[Pp][Ii]                    {yylval.float_val = 3.1415926; return CONST_ID;}
 [0-9]+(\.[0-9]+)?           {yylval.float_val = atof(yytext);return CONST_ID;}
 [a-zA-Z]+                   {return ID;}
 [ \t]                       {}
